@@ -1,49 +1,39 @@
-@import url('https://fonts.googleapis.com/css?family=Oswald');
-@import url('https://fonts.googleapis.com/css?family=Raleway');
 * {
 	font-family: "Helvetica Neue Bold", Roboto, Helvetica, Arial, sans-serif;
 	font-weight: 700;
+
+}
+.container{
+	background: url("/static/pattern.png");
+	background-repeat:space;
+	background-size: cover;
 }
 
 h1 {
 	font-family: "Helvetica Neue Light", Roboto, Helvetica, Arial, sans-serif;
 	font-size: 50px;
-	color: #51453B;
+	color: #52463c;
 	line-height: 60px;
 	font-weight: 300;
+	align-items: center;
 }
 
 h2 {
-  color: #333;
-  font-family: "Raleway",sans-serif;
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  margin-left: 15px;
-  margin-bottom: 5px;
+	font-size: 24px;
+	color: #a7949c;
+	line-height: 29px;
 }
 
-h3 {
-  color: #333;
-  font-family: "Raleway",sans-serif;
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  margin-left: 15px;
-  margin-bottom: 5px;
-  background: pink;
+.brand-list h3 {
+	font-size: 18px;
+	color: #522e49;
+	line-height: 23px;
 }
-input{
-  margin-bottom: 25px;
-  width: 45%;
-  height: 25px;
-  text-align: center;
-  font-family: "Raleway",sans-serif;
-  font-size: 15px;
-  border: none;
-  background: #f2f2f2;
+.brand-list h3:hover {
+	font-size: 18px;
+	color: #fac4e4;
+	line-height: 23px;
 }
-
 
  p {
  	font-family: "Helvetica Neue", Roboto, Helvetica, Arial, sans-serif;
@@ -77,14 +67,14 @@ input{
 	padding: 0;
 }
 .btn {
-	padding: 20px;
+	padding: 10px;
 	margin: 0;
-	border-color: #9FB80A;
+	border-color: #b80a77;
 	border-width: 2px;
-	color: #96580A;;
+	color: #b80a77;;
 }
 .btn:hover {
-	border-color: #9FB80A;
+	border-color: #b80a77;
 }
 .btn.delete {
 	border-color: #aaaaaa;
@@ -93,18 +83,6 @@ input{
 .btn.delete:hover {
 	border-color: #aaaaaa;
 	color: red;
-}
-button{
-  width: 15%;
-  height: 35px;
-  text-align: center;
-  font-family: "Oswald",sans-serif;
-  font-size: 15px;
-  font-weight: bold;
-  background-color:yellow;
-  border: none;
-  color: #333;
-  cursor: pointer;
 }
 .glyphicon {
 	margin-right: 10px;
@@ -128,39 +106,47 @@ button{
 	height: 15px;
 }
 .divider.blue {
-	background-color: #42C3C9;
+	background-color: #da87d9;
+	width: 1366px;
 }
 .divider.green {
-	background-color: #9FB80A;
+	background-color: #2c969d;
 }
 .banner.main {
-	height: 150px;
-	
+	margin: auto;
+	width: 1366px;
+	height: 453px;
+	background: url("/static/m.png");
 	background-position: right;
 	background-repeat: no-repeat;
 	background-size: cover;
+ flex-basis: auto;
+
 }
 .banner.menu {
 	height: 150px;
-	background-color: #E1E17F;
+	background-color: #f6afe2;
 }
 .banner.profile {
 	height: 150px;
-	background-color: #A6E8EB;
+	background-color: #500e34;
 }
 .banner h1 {
-	margin: 45px 0;
+	margin: auto;
 }
  .brand-list {
- 	background-color: #F0F0F0;
- 	padding: 20px;
+ 	background-color: #522e49;
+ 	padding: 15px;
 u }
  .brand-list:hover {
- 	background-color: #e1e17f;
- 	padding: 20px;
+ 	background-color: #fac4e4;
+ 	padding: 15px;
+	font-size: 18px;
+	color: #d7b4b4;
+	line-height: 23px;
 }
 .mackeup-item {
-	background: #F0F0F0;
+	background: #54364c;
 	padding: 20px;
 	margin: 20px;
 	margin-left: -20px;
@@ -185,7 +171,7 @@ u }
 	margin-top: -20px;
 }
 .flash {
-	background-color: #545B98;
+	background-color: #2b92f1;
 	width:100%;
 	text-decoration: none;
 
@@ -195,4 +181,9 @@ u }
 	list-style-type: none;
 	text-align: center;
 
+}
+img{
+	width: 100px;
+	height: 100px;
+	border-radius: 150px;
 }

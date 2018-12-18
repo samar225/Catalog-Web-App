@@ -8,8 +8,8 @@
 		<div class="col-md-11 col-md-offset-1 padding-none">
 			<h1>{{ brand.name }}
 			<figure class="creator">
-				<img src="{{ url_for('static', filename='blank_user.gif') }}">
-				<figcaption>Menu creator's name goes here</figcaption>
+				<img src="{{ creator.picture}}">
+				<figcaption>{{ creator.name }}</figcaption>
 			</figure>
 			</h1>
 
@@ -33,16 +33,16 @@
 		<div class="col-md-1"></div>
 		<div class="col-md-11 padding-none">
 			<a href="{{url_for('editBrand', brand_id = brand.id )}}">
-				<button class="btn btn-default" id="new-menu-item">
+				<button class="btn btn-default" id="new-mackeup-item">
 					<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>Edit Brand
 				</button>
 			</a>
-			<a href="{{url_for('newMackeupItem', brand = brand.id )}}">
+			<a href="{{url_for('newMackeupItem', brand_id = brand.id )}}">
 				<button class="btn btn-default" id="new-mackeup-item">
 					<span class="glyphicon glyphicon-glass" aria-hidden="true"></span>Add Mackeup Item
 				</button>
 			</a>
-						<a href="{{url_for('deleteBrand', brand = brand.id )}}">
+						<a href="{{url_for('deleteBrand', brand_id = brand.id )}}">
 				<button class="btn btn-default delete" id="delete-brand">
 					<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Delete Brand
 				</button>
@@ -57,13 +57,13 @@
 			<div class="col-md-3">
 				<h2>Eyeshadow</h2>
 					{% for i in items %}
-						{% if i.course == 'Eyeshadow' %}
+						{% if i.type == 'Eyeshadow' %}
 							<div class="mackeup-item">
 								<h3>{{i.name}}</h3>
 								<p>{{i.description}}</p>
 								<p class="mackeup-price">{{i.price}}</p>
 								<a href='{{url_for('editMakeupItem', brand_id = brand.id, mackeup_id=i.id ) }}'>Edit</a> |
-								<a href='{{url_for('deleteMackeupItem', brand_id = mackeup.id, mackeup_id=i.id ) }}'>Delete</a>
+								<a href='{{url_for('deleteMackeupItem', brand_id = brand.id, mackeup_id=i.id ) }}'>Delete</a>
 							</div>
 						{% endif %}
 					{% endfor %}
@@ -71,7 +71,7 @@
 			<div class="col-md-4">
 				<h2>Lip Stick</h2>
 					{% for i in items %}
-						{% if i.course == 'Lip Stick' %}
+						{% if i.type == 'Lip Stick' %}
 						<div class="mackeup-item">
 							<h3>{{i.name}}</h3>
 							<p>{{i.description}}</p>
@@ -85,7 +85,7 @@
 			<div class="col-md-3">
 				<h2>Bowder</h2>
 					{% for i in items %}
-						{% if i.course == 'Bowder' %}
+						{% if i.type == 'Bowder' %}
 						<div class="mackeup-item">
 							<h3>{{i.name}}</h3>
 							<p>{{i.description}}</p>
@@ -97,7 +97,7 @@
 					{% endfor %}
 				<h2>Foundation</h2>
 					{% for i in items %}
-						{% if i.course == 'Foundation' %}
+						{% if i.type == 'Foundation' %}
 						<div class="mackeup-item">
 							<h3>{{i.name}}</h3>
 							<p>{{i.description}}</p>

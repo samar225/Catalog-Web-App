@@ -153,6 +153,7 @@ def getUserID(email):
 # DISCONNECT - Revoke a current user's token and reset their login_session
 @app.route('/gdisconnect')
 def gdisconnect():
+    # Only disconnect a connected user.
     access_token = login_session['access_token']
     print 'In gdisconnect access token is %s', access_token
     print 'User name is: '
@@ -185,9 +186,9 @@ def gdisconnect():
         return response
 
 # JSON APIs to view Brand Information
-@app.route('/brand/<int:brand>/mackeup/JSON')
-def brandMackeupJSON(mackeup_id):
-    brands = session.query(Brand).filter_by(id=brand_id).one()
+@app.route('/brand/<int:brand_id>/mackeup/JSON')
+def brandMackeupJSON(brand_id):
+    brand = session.query(Brand).filter_by(id=brand_id).one()
     items = session.query(MackeupItem).filter_by(
         brand_id=brand_id).all()
     return jsonify(MackeupItem=[i.serialize for i in items])
@@ -195,7 +196,7 @@ def brandMackeupJSON(mackeup_id):
 
 @app.route('/brand/<int:brand_id>/mackeup/<int:mackeup_id>/JSON')
 def mackeupItemJSON(brand_id, mackeup_id):
-    Mackeup = session.query(Mackeup).filter_by(id=mackeup_id).one()
+    Mackeup_Item = session.query(MackeupItem).filter_by(id=mackeup_id).one()
     return jsonify(Mackeup_Item=Mackeup_Item.serialize)
 
 
@@ -284,11 +285,11 @@ def newMackeupItem(brand_id):
         return "<script>function myFunction() {alert('You are not authorized to add mackeup items to this brand. Please create your own brand in order to add items.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         newItem = MackeupItem(name=request.form['name'],
-                              description=request.form['description'],
-                              price=request.form['price'],
-                              type=request.form['type'],
-                              brand_id=brand_id,
-                              user_id=brand.user_id)
+            description=request.form['description'],
+            price=request.form['price'],
+            type=request.form['type'],
+            brand_id=brand_id,
+            user_id=brand.user_id)
         session.add(newItem)
         session.commit()
         flash('New Mackeup %s Item Successfully Created' % (newItem.name))
@@ -299,9 +300,7 @@ def newMackeupItem(brand_id):
 # Edit a mackeup item
 @app.route(
     '/brand/<int:brand_id>/mackeup/<int:mackeup_id>/edit',
-    methods=[
-        'GET',
-        'POST'])
+    methods=['GET', 'POST'])
 def editMackeupItem(brand_id, mackeup_id):
     editedItem = session.query(MackeupItem).filter_by(id=mackeup_id).one()
     brand = session.query(Brand).filter_by(id=brand_id).one()
