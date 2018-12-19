@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
+from flask import Flask, render_template, request, redirect
+from flask import jsonify, url_for, flash
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Brand, MackeupItem, User
@@ -20,7 +21,8 @@ APPLICATION_NAME = "Mackeup Application"
 
 
 # Connect to Database and create database session
-engine = create_engine('sqlite:///mackeupitemtypewithusers.db?check_same_thread=False')
+engine = create_engine(
+    'sqlite:///mackeupitemtypewithusers.db?check_same_thread=False')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
@@ -123,12 +125,15 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = width: 300px; height: 300px;border-radius: 150px;"'
+    '"-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
 
 # User Helper Functions
+
+
 def createUser(login_session):
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
@@ -151,6 +156,8 @@ def getUserID(email):
         return None
 
 # DISCONNECT - Revoke a current user's token and reset their login_session
+
+
 @app.route('/gdisconnect')
 def gdisconnect():
     # Only disconnect a connected user.
@@ -164,7 +171,8 @@ def gdisconnect():
             'Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+    url = 'https://accounts.google.com/o/oauth2/'
+    'revoke?token=%s' % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print 'result is '
@@ -186,6 +194,8 @@ def gdisconnect():
         return response
 
 # JSON APIs to view Brand Information
+
+
 @app.route('/brand/<int:brand_id>/mackeup/JSON')
 def brandMackeupJSON(brand_id):
     brand = session.query(Brand).filter_by(id=brand_id).one()
@@ -206,6 +216,8 @@ def brandJSON():
     return jsonify(brands=[r.serialize for r in brands])
 
 # Show all brands
+
+
 @app.route('/')
 @app.route('/brand/')
 def showBrands():
@@ -216,6 +228,8 @@ def showBrands():
         return render_template('brands.html', brands=brands)
 
 # Create a new brand
+
+
 @app.route('/brand/new/', methods=['GET', 'POST'])
 def newBrand():
     if 'username' not in login_session:
@@ -231,13 +245,18 @@ def newBrand():
         return render_template('newBrand.html')
 
 # Edit a brand
+
+
 @app.route('/brand/<int:brand_id>/edit/', methods=['GET', 'POST'])
 def editBrand(brand_id):
     editedBrand = session.query(Brand).filter_by(id=brand_id).one()
     if 'username' not in login_session:
         return redirect('/login')
     if editedBrand.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not authorized to edit this brand. Please create your own brand in order to edit.');}</script><body onload='myFunction()'>"
+        return "<script>function myFunction() {alert('You are not "
+        "authorized to edit this brand."
+        "Please create your own brand in order to edit.');}"
+        "</script><body onload='myFunction()'>"
     if request.method == 'POST':
         if request.form['name']:
             editedBrand.name = request.form['name']
@@ -247,13 +266,18 @@ def editBrand(brand_id):
         return render_template('editBrand.html', brand=editedBrand)
 
 # Delete a brand
+
+
 @app.route('/brand/<int:brand_id>/delete/', methods=['GET', 'POST'])
 def deleteBrand(brand_id):
     brandToDelete = session.query(Brand).filter_by(id=brand_id).one()
     if 'username' not in login_session:
         return redirect('/login')
     if brandToDelete.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not authorized to delete this brand. Please create your own brand in order to delete.');}</script><body onload='myFunction()'>"
+        return "<script>function myFunction() {alert('You are not "
+        "authorized to delete this brand."
+        " Please create your own brand in order to delete.');}</script>"
+        "<body onload='myFunction()'>"
     if request.method == 'POST':
         session.delete(brandToDelete)
         flash('%s Successfully Deleted' % brandToDelete.name)
@@ -263,6 +287,8 @@ def deleteBrand(brand_id):
         return render_template('deleteBrand.html', brand=brandToDelete)
 
 # Show a brand mackeup
+
+
 @app.route('/brand/<int:brand_id>/')
 @app.route('/brand/<int:brand_id>/mackeup/')
 def showMackeup(brand_id):
@@ -271,25 +297,32 @@ def showMackeup(brand_id):
     items = session.query(MackeupItem).filter_by(
         brand_id=brand_id).all()
     if 'username' not in login_session or creator.id != login_session['user_id']:
-        return render_template('publicmackeup.html', items=items, brand=brand, creator=creator)
+        return render_template('publicmackeup.html', items=items,
+                               brand=brand, creator=creator)
     else:
-        return render_template('mackeup.html', items=items, brand=brand, creator=creator)
+        return render_template('mackeup.html', items=items,
+                               brand=brand, creator=creator)
 
 # Create a new mackeup item
+
+
 @app.route('/brand/<int:brand_id>/mackeup/new/', methods=['GET', 'POST'])
 def newMackeupItem(brand_id):
     if 'username' not in login_session:
         return redirect('/login')
     brand = session.query(Brand).filter_by(id=brand_id).one()
     if login_session['user_id'] != brand.user_id:
-        return "<script>function myFunction() {alert('You are not authorized to add mackeup items to this brand. Please create your own brand in order to add items.');}</script><body onload='myFunction()'>"
+        return "<script>function myFunction() {alert('You are not "
+        "authorized to add mackeup items to this brand."
+        " Please create your own brand in order to add items.');}"
+        "</script><body onload='myFunction()'>"
     if request.method == 'POST':
         newItem = MackeupItem(name=request.form['name'],
-            description=request.form['description'],
-            price=request.form['price'],
-            type=request.form['type'],
-            brand_id=brand_id,
-            user_id=brand.user_id)
+                              description=request.form['description'],
+                              price=request.form['price'],
+                              type=request.form['type'],
+                              brand_id=brand_id,
+                              user_id=brand.user_id)
         session.add(newItem)
         session.commit()
         flash('New Mackeup %s Item Successfully Created' % (newItem.name))
@@ -298,6 +331,8 @@ def newMackeupItem(brand_id):
         return render_template('newmackeupitem.html', brand_id=brand_id)
 
 # Edit a mackeup item
+
+
 @app.route(
     '/brand/<int:brand_id>/mackeup/<int:mackeup_id>/edit',
     methods=['GET', 'POST'])
@@ -305,7 +340,11 @@ def editMackeupItem(brand_id, mackeup_id):
     editedItem = session.query(MackeupItem).filter_by(id=mackeup_id).one()
     brand = session.query(Brand).filter_by(id=brand_id).one()
     if login_session['user_id'] != brand.user_id:
-        return "<script>function myFunction() {alert('You are not authorized to edit mackeup items to this brand. Please create your own brand in order to edit items.');}</script><body onload='myFunction()'>"
+        return "<script>function myFunction() {alert('You are not "
+        "authorized to edit"
+        " mackeup items to this brand."
+        " Please create your own brand in order to edit items."
+        "');}</script><body onload='myFunction()'>"
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
@@ -329,6 +368,8 @@ def editMackeupItem(brand_id, mackeup_id):
             item=editedItem)
 
 # Delete a mackeup item
+
+
 @app.route(
     '/brand/<int:brand_id>/mackeup/<int:mackeup_id>/delete',
     methods=[
@@ -340,16 +381,21 @@ def deleteMackeupItem(brand_id, mackeup_id):
     brand = session.query(Brand).filter_by(id=brand_id).one()
     itemToDelete = session.query(MackeupItem).filter_by(id=mackeup_id).one()
     if login_session['user_id'] != brand.user_id:
-        return "<script>function myFunction() {alert('You are not authorized to delete mackeup items to this brand. Please create your own brand in order to delete items.');}</script><body onload='myFunction()'>"
+        return "<script>function myFunction() {alert("
+        "'You are not authorized to delete mackeup"
+        " items to this brand. Please create your own brand in order"
+        " to delete items.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()
         flash('Mackeup Item Successfully Deleted')
         return redirect(url_for('showMackeup', brand_id=brand_id))
     else:
-        return render_template('deletMackeupItem.html', item=itemToDelete)
+        return render_template('deletemackeupitem.html', item=itemToDelete)
 
 # Disconnect based on provider
+
+
 @app.route('/disconnect')
 def disconnect():
     if 'provider' in login_session:
@@ -358,7 +404,7 @@ def disconnect():
             del login_session['access_token']
             del login_session['gplus_id']
             flash("You have successfully been logged out.")
-            return redirect(url_for('showRestaurants'))
+            return redirect(url_for('showBrands'))
 
     else:
         flash("You were not logged in")

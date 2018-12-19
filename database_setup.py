@@ -41,7 +41,7 @@ class MackeupItem(Base):
     price = Column(String(8))
     type = Column(String(250))
     brand_id = Column(Integer, ForeignKey('brand.id'))
-    brand = relationship(Brand)
+    brand = relationship(Brand, backref=backref("MackeupItem", cascade="all,delete")))
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
