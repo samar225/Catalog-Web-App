@@ -12,13 +12,13 @@ import httplib2
 import json
 from flask import make_response
 import requests
+from functools import wraps
 
 app = Flask(__name__)
 
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Mackeup Application"
-
 
 # Connect to Database and create database session
 engine = create_engine(
@@ -27,6 +27,15 @@ Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+
+def login_required(f):
+    @wraps(f)
+    def x(*args, **kwargs):
+        if 'username' not in login_session:
+            return redirect('/login')
+        return f(*args, **kwargs)
+    return x
 
 
 # Create anti-forgery state token
@@ -125,8 +134,8 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = width: 300px; height: 300px;border-radius: 150px;"'
-    '"-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = width: 300px; height: 300px;border-radius: 150px; \
+    -webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -160,38 +169,29 @@ def getUserID(email):
 
 @app.route('/gdisconnect')
 def gdisconnect():
-    # Only disconnect a connected user.
-    access_token = login_session['access_token']
-    print 'In gdisconnect access token is %s', access_token
-    print 'User name is: '
-    print login_session['username']
+        # Only disconnect a connected user.
+    access_token = login_session.get('access_token')
     if access_token is None:
-        print 'Access Token is None'
-        response = make_response(json.dumps(
-            'Current user not connected.'), 401)
+        response = make_response(
+            json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    url = 'https://accounts.google.com/o/oauth2/'
-    'revoke?token=%s' % login_session['access_token']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
-    print 'result is '
-    print result
+
     if result['status'] == '200':
-        # del login_session['access_token']
-        # del login_session['gplus_id']
-        # del login_session['username']
-        # del login_session['email']
-        # del login_session['picture']
+
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
-        print "this is the status " + result['status']
-        response = make_response(json.dumps(
-            'Failed to revoke token for given user.', 400))
+        # For whatever reason, the given token was invalid.
+        response = make_response(
+            json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
         return response
+
 
 # JSON APIs to view Brand Information
 
@@ -231,9 +231,8 @@ def showBrands():
 
 
 @app.route('/brand/new/', methods=['GET', 'POST'])
+@login_required
 def newBrand():
-    if 'username' not in login_session:
-        return redirect('/login')
     if request.method == 'POST':
         newBrand = Brand(
             name=request.form['name'], user_id=login_session['user_id'])
@@ -248,14 +247,13 @@ def newBrand():
 
 
 @app.route('/brand/<int:brand_id>/edit/', methods=['GET', 'POST'])
+@login_required
 def editBrand(brand_id):
     editedBrand = session.query(Brand).filter_by(id=brand_id).one()
-    if 'username' not in login_session:
-        return redirect('/login')
     if editedBrand.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not "
-        "authorized to edit this brand."
-        "Please create your own brand in order to edit.');}"
+        return "<script>function myFunction() {alert('You are not \
+        authorized to edit this brand. \
+        Please create your own brand in order to edit.');}"
         "</script><body onload='myFunction()'>"
     if request.method == 'POST':
         if request.form['name']:
@@ -269,15 +267,15 @@ def editBrand(brand_id):
 
 
 @app.route('/brand/<int:brand_id>/delete/', methods=['GET', 'POST'])
+@login_required
 def deleteBrand(brand_id):
     brandToDelete = session.query(Brand).filter_by(id=brand_id).one()
-    if 'username' not in login_session:
-        return redirect('/login')
+
     if brandToDelete.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not "
-        "authorized to delete this brand."
-        " Please create your own brand in order to delete.');}</script>"
-        "<body onload='myFunction()'>"
+        return "<script>function myFunction() {alert('You are not \
+        authorized to delete this brand.\
+         Please create your own brand in order to delete.');}</script>\
+         <body onload='myFunction()'>"
     if request.method == 'POST':
         session.delete(brandToDelete)
         flash('%s Successfully Deleted' % brandToDelete.name)
@@ -307,15 +305,14 @@ def showMackeup(brand_id):
 
 
 @app.route('/brand/<int:brand_id>/mackeup/new/', methods=['GET', 'POST'])
+@login_required
 def newMackeupItem(brand_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     brand = session.query(Brand).filter_by(id=brand_id).one()
     if login_session['user_id'] != brand.user_id:
-        return "<script>function myFunction() {alert('You are not "
-        "authorized to add mackeup items to this brand."
-        " Please create your own brand in order to add items.');}"
-        "</script><body onload='myFunction()'>"
+        return "<script>function myFunction() {alert('You are not \
+        authorized to add mackeup items to this brand. \
+        Please create your own brand in order to add items.');} \
+        </script><body onload='myFunction()'>"
     if request.method == 'POST':
         newItem = MackeupItem(name=request.form['name'],
                               description=request.form['description'],
@@ -336,17 +333,17 @@ def newMackeupItem(brand_id):
 @app.route(
     '/brand/<int:brand_id>/mackeup/<int:mackeup_id>/edit',
     methods=['GET', 'POST'])
+@login_required
 def editMackeupItem(brand_id, mackeup_id):
     editedItem = session.query(MackeupItem).filter_by(id=mackeup_id).one()
     brand = session.query(Brand).filter_by(id=brand_id).one()
     if login_session['user_id'] != brand.user_id:
-        return "<script>function myFunction() {alert('You are not "
-        "authorized to edit"
-        " mackeup items to this brand."
-        " Please create your own brand in order to edit items."
-        "');}</script><body onload='myFunction()'>"
-    if 'username' not in login_session:
-        return redirect('/login')
+        return "<script>function myFunction() {alert('You are not \
+        authorized to edit \
+        mackeup items to this brand. \
+        Please create your own brand in order to edit items. \
+        ');}</script><body onload='myFunction()'>"
+
     if request.method == 'POST':
         if request.form['name']:
             editedItem.name = request.form['name']
@@ -375,16 +372,15 @@ def editMackeupItem(brand_id, mackeup_id):
     methods=[
         'GET',
         'POST'])
+@login_required
 def deleteMackeupItem(brand_id, mackeup_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     brand = session.query(Brand).filter_by(id=brand_id).one()
     itemToDelete = session.query(MackeupItem).filter_by(id=mackeup_id).one()
     if login_session['user_id'] != brand.user_id:
-        return "<script>function myFunction() {alert("
-        "'You are not authorized to delete mackeup"
-        " items to this brand. Please create your own brand in order"
-        " to delete items.');}</script><body onload='myFunction()'>"
+        return "<script>function myFunction() {alert( \
+        'You are not authorized to delete mackeup \
+         items to this brand. Please create your own brand in order \
+         to delete items.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()
@@ -403,8 +399,13 @@ def disconnect():
             gdisconnect()
             del login_session['access_token']
             del login_session['gplus_id']
-            flash("You have successfully been logged out.")
-            return redirect(url_for('showBrands'))
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+        del login_session['user_id']
+        del login_session['provider']
+        flash("You have successfully been logged out.")
+        return redirect(url_for('showBrands'))
 
     else:
         flash("You were not logged in")

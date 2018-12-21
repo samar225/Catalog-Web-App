@@ -4,7 +4,7 @@
 	<div class="row divider green">
 		<div class="col-md-12"></div>
 	</div>
-	<div class="row banner mackeup">
+	<div class="row banner mackeup" id="new">
 		<div class="col-md-11 col-md-offset-1 padding-none">
 			<h1>Edit Mackeup Item</h1>
 		</div>
@@ -14,20 +14,20 @@
 			<form action="#" method = "post">
 				<div class="form-group">
 					<label for="name">Name:</label>
-					<input type ="text" maxlength="100" class="form-control" name="name" value="{{item.name }}">
-
+					<input type ="text" maxlength="100" class="form-control" name="name" value="{{item.name }}" required>
+          <br>
 					<label for="description">Description:</label>
-					<textarea class="form-control" maxlength="250" rows="3" name="description">{{item.description}}</textarea>
-
-					<label for="price">Price:</label>
+					<textarea class="form-control" maxlength="250" rows="3" name="description" required>{{item.description}}</textarea>
+          <br>
+					<label for="price">Price $:</label>
 					<div class="input-group">
-						<div class="input-group-addon">$</div>
-						<input type ="text" maxlength="10" class="form-control" name="price" value="{{item.price}}">
+						<div class="input-group-addon"></div>
+						<input type ="text" maxlength="10" class="form-control" name="price" value="{{item.price}}" required>
 					</div>
 					<label for="type">Type:</label>
 					<div class="radio">
 					  <label>
-					    <input type="radio" name="type" id="type1" value="Eyeshadow" {% if item.type == 'Eyeshadow'%}checked{%endif%}>Eyeshadow
+					    <input type="radio" name="type" id="type1" value="Eyeshadow" {% if item.type == 'Eyeshadow'%}checked{%endif%} required>Eyeshadow
 					  </label>
 					</div>
 					<div class="radio">

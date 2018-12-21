@@ -2,6 +2,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
+from sqlalchemy.orm import backref
 
 Base = declarative_base()
 
@@ -41,7 +42,8 @@ class MackeupItem(Base):
     price = Column(String(8))
     type = Column(String(250))
     brand_id = Column(Integer, ForeignKey('brand.id'))
-    brand = relationship(Brand, backref=backref("MackeupItem", cascade="all,delete")))
+    brand = relationship("Brand", backref=backref(
+        "MackeupItem", cascade="all,delete"))
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 

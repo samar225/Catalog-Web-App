@@ -4,7 +4,7 @@
 	<div class="row divider green">
 		<div class="col-md-12"></div>
 	</div>
-	<div class="row banner mackeup">
+	<div class="row banner mackeup" id="new">
 		<div class="col-md-11 col-md-offset-1 padding-none">
 			<h1>New Mackeup Item</h1>
 		</div>
@@ -14,20 +14,20 @@
 			<form action="#" method = "post">
 				<div class="form-group">
 					<label for="name">Name:</label>
-					<input type ="text" maxlength="50" class="form-control" name="name"placeholder="Name of the type">
-
+					<input type ="text" maxlength="50" class="form-control" name="name"placeholder="Name of the type" required>
+          <br>
 					<label for="description">Description:</label>
-					<textarea class="form-control" maxlength="250" rows="3" name="description" placeholder="Description of the type"></textarea>
+					<textarea class="form-control" maxlength="250" rows="3" name="description" placeholder="Description of the type" required></textarea>
 
-					<label for="price">Price:</label>
 					<div class="input-group">
-						<div class="input-group-addon">$</div>
-						<input type ="text" class="form-control" maxlength="10" name="price" placeholder="Price in $">
+						<label for="price">Price $:</label>
+						<div class="input-group-addon"></div>
+						<input type ="text" class="form-control" maxlength="10" name="price" placeholder="Price in $" required>
 					</div>
 					<label for="type">Type:</label>
-					<div class="radio">
+					<div class="radio" required>
 					  <label>
-					    <input type="radio" name="type" id="type1" value="Eyeshadow">Eyeshadow
+					    <input type="radio" name="type" id="type1" value="Eyeshadow" required>Eyeshadow
 					  </label>
 					</div>
 					<div class="radio">
